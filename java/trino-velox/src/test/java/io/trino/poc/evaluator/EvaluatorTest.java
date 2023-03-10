@@ -12,6 +12,7 @@ public class EvaluatorTest {
             Evaluator eval = Evaluator.make();
             try (Evaluator.Result result = eval.evaluate(allocator)) {
 
+                System.out.println("hello trino poc");
             }
         }
 

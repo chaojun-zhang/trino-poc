@@ -10,7 +10,7 @@ import java.util.Locale;
 import static java.util.UUID.randomUUID;
 
 class JniLoader {
-    private static final String LIBRARY_NAME = "bdtk_jni";
+    private static final String LIBRARY_NAME = "velox_jni";
 
     private static volatile JniLoader INSTANCE;
 

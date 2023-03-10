@@ -329,13 +329,19 @@
     </dependencies>
 
 
-    <modules>
-        <module>trino-wrapper</module>
-    </modules>
+    <!--    <modules>-->
+    <!--        <module>trino-velox</module>-->
+    <!--    </modules>-->
     <profiles>
         <profile>
-            <id>generate-libs-jni-macos-linux</id>
+            <id>trino-velox-test</id>
+            <modules>
+                <module>trino-velox</module>
+            </modules>
 
+        </profile>
+        <profile>
+            <id>trino-velox-jni</id>
             <build>
                 <plugins>
                     <plugin>
@@ -343,41 +349,6 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>3.1.0</version>
                         <executions>
-                            <execution>
-                                <id>jni-cpp-cmake</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>cmake</executable>
-                                    <commandlineArgs>
-                                        -S cpp
-                                        -B cpp-jni
-                                        -DCMAKE_BUILD_TYPE=Release
-                                        -DCMAKE_INSTALL_LIBDIR=lib/${os.detected.arch}
-                                        -DCMAKE_INSTALL_PREFIX=java-dist
-                                        -DCMAKE_UNITY_BUILD=ON
-                                    </commandlineArgs>
-                                    <workingDirectory>../</workingDirectory>
-                                    <skip>${cpp.dependencies.builded}</skip>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>jni-cpp-build</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>cmake</executable>
-                                    <commandlineArgs>
-                                        --build cpp-jni --target install --config Release
-                                    </commandlineArgs>
-                                    <workingDirectory>../</workingDirectory>
-                                    <skip>${cpp.dependencies.builded}</skip>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>jni-cmake</id>
                                 <phase>generate-resources</phase>
