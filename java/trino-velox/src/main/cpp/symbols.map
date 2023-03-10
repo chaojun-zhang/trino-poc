@@ -1,0 +1,4 @@
+{
+  global: extern "C++" { bdtk*; }; Java*; JNI*;
+  local: *;
+};
