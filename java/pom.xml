@@ -35,6 +35,8 @@
         <dep.fbs.version>1.12.0</dep.fbs.version>
         <dep.avro.version>1.10.0</dep.avro.version>
         <forkCount>2</forkCount>
+        <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
+        <error_prone_core.version>2.16</error_prone_core.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     </properties>
 
@@ -49,7 +51,6 @@
         </extensions>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -135,24 +136,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>analyze</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>analyze-only</goal>
-                        </goals>
-                        <configuration>
-                            <ignoreNonCompile>true</ignoreNonCompile>
-                            <failOnWarning>true</failOnWarning>
-                            <ignoredDependencies>
-                                <!-- source annotations (not kept in compiled code) -->
-                                <ignoredDependency>javax.annotation:javax.annotation-api:*</ignoredDependency>
-                                <ignoredDependency>org.apache.hadoop:hadoop-client-api</ignoredDependency>
-                            </ignoredDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
+
             </plugin>
 
         </plugins>
@@ -329,13 +313,107 @@
     </dependencies>
 
 
-    <modules>
-        <module>trino-wrapper</module>
-    </modules>
+    <!--    <modules>-->
+    <!--        <module>trino-velox</module>-->
+    <!--    </modules>-->
     <profiles>
         <profile>
-            <id>generate-libs-jni-macos-linux</id>
+            <id>error-prone-jdk8</id>
+            <!--
+                 Do not activate Error Prone while running with Eclipse/M2E as it causes incompatibilities
+                 with other annotation processors.
+                 See https://github.com/jbosstools/m2e-apt/issues/62 for details
+            -->
+            <activation>
+                <jdk>1.8</jdk>
+                <property>
+                    <name>!m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-XDcompilePolicy=simple</arg>
+                                <arg>-Xplugin:ErrorProne</arg>
+                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>2.4.0</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
+        <profile>
+            <id>error-prone-jdk11+</id>
+            <activation>
+                <jdk>[11,]</jdk>
+                <property>
+                    <name>!m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>8</source>
+                            <target>8</target>
+                            <encoding>UTF-8</encoding>
+                            <compilerArgs combine.children="append">
+                                <arg>-XDcompilePolicy=simple</arg>
+                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/(target/generated-sources)/.*</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths combine.children="append">
+                                <path>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${error_prone_core.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>trino-velox-test</id>
+            <modules>
+                <module>trino-velox</module>
+            </modules>
+
+        </profile>
+        <profile>
+            <id>trino-velox-jni</id>
             <build>
                 <plugins>
                     <plugin>
@@ -343,41 +421,6 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>3.1.0</version>
                         <executions>
-                            <execution>
-                                <id>jni-cpp-cmake</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>cmake</executable>
-                                    <commandlineArgs>
-                                        -S cpp
-                                        -B cpp-jni
-                                        -DCMAKE_BUILD_TYPE=Release
-                                        -DCMAKE_INSTALL_LIBDIR=lib/${os.detected.arch}
-                                        -DCMAKE_INSTALL_PREFIX=java-dist
-                                        -DCMAKE_UNITY_BUILD=ON
-                                    </commandlineArgs>
-                                    <workingDirectory>../</workingDirectory>
-                                    <skip>${cpp.dependencies.builded}</skip>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>jni-cpp-build</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>cmake</executable>
-                                    <commandlineArgs>
-                                        --build cpp-jni --target install --config Release
-                                    </commandlineArgs>
-                                    <workingDirectory>../</workingDirectory>
-                                    <skip>${cpp.dependencies.builded}</skip>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>jni-cmake</id>
                                 <phase>generate-resources</phase>

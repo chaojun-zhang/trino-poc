@@ -2,12 +2,13 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
                     ${JNI_INCLUDE_DIRS} ${JNI_HEADERS_DIR})
 
 add_jar(trino_java_jni_velox_jar
-        src/main/java/io/trino/poc/evaluator/JniWrapper.java
+        src/main/java/io/trino/velox/TaskJniWrapper.java
         GENERATE_NATIVE_HEADERS
         trino_java_jni_velox_headers)
 
 
 add_library(trino_java_jni_velox SHARED
+            src/main/cpp/velox_task.cc
             src/main/cpp/jni_common.cc)
 set_property(TARGET trino_java_jni_velox PROPERTY OUTPUT_NAME "velox_jni")
 target_link_libraries(trino_java_jni_velox

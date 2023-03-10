@@ -18,7 +18,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>io.trino.poc</groupId>
     <artifactId>trino_velox</artifactId>
     <packaging>jar</packaging>
     <name>trino velox</name>
@@ -34,6 +33,11 @@
             <version>${arrow.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.arrow</groupId>
+            <artifactId>arrow-memory-unsafe</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -42,7 +46,7 @@
     <build>
         <resources>
             <resource>
-                <directory>/workspace/trino_poc/java-dist/lib</directory>
+                <directory>${project.basedir}/../../java-dist/lib</directory>
                 <includes>
                     <include>**/*velox_jni.*</include>
                 </includes>
