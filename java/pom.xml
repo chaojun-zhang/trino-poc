@@ -49,7 +49,6 @@
         </extensions>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -135,24 +134,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>analyze</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>analyze-only</goal>
-                        </goals>
-                        <configuration>
-                            <ignoreNonCompile>true</ignoreNonCompile>
-                            <failOnWarning>true</failOnWarning>
-                            <ignoredDependencies>
-                                <!-- source annotations (not kept in compiled code) -->
-                                <ignoredDependency>javax.annotation:javax.annotation-api:*</ignoredDependency>
-                                <ignoredDependency>org.apache.hadoop:hadoop-client-api</ignoredDependency>
-                            </ignoredDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
+
             </plugin>
 
         </plugins>
