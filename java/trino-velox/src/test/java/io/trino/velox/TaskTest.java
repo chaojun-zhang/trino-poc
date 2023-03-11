@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class TaskTest {
     @Test
-    public void testEvaluate() throws Exception {
+    public void testNextBatch() throws Exception {
         try (BufferAllocator allocator = new RootAllocator(); Task task = Task.make(true)) {
             int batchIdx = 0;
             while (!task.isFinished()) {
