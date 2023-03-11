@@ -3,19 +3,20 @@ package io.trino.velox;
 
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.VectorSchemaRoot;
 import org.junit.Test;
 
 public class TaskTest {
     @Test
     public void testEvaluate() throws Exception {
-        try (BufferAllocator allocator = new RootAllocator(); Task task = Task.make()) {
-            int batchIdx =0;
+        try (BufferAllocator allocator = new RootAllocator(); Task task = Task.make(true)) {
+            int batchIdx = 0;
             while (!task.isFinished()) {
-                try (Task.ColumnBatch batch = task.nextBatch(allocator)) {
+                try (VectorSchemaRoot batch = task.nextBatch(allocator)) {
                     System.out.println("fetch batch " + batchIdx++ + " from backend");
                 }
             }
-
+            System.out.println("fetch batch finished");
         }
     }
 
