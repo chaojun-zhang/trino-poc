@@ -1,4 +1,4 @@
-package io.trino.poc.evaluator;
+package io.trino.velox;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,10 +14,10 @@ class JniLoader {
 
     private static volatile JniLoader INSTANCE;
 
-    private final JniWrapper wrapper;
+    private final TaskJniWrapper wrapper;
 
     private JniLoader() {
-        this.wrapper = new JniWrapper();
+        this.wrapper = new TaskJniWrapper();
     }
 
     static JniLoader getInstance() {
@@ -98,7 +98,7 @@ class JniLoader {
     /**
      * Returns the jni wrapper.
      */
-    JniWrapper getWrapper() {
+    TaskJniWrapper getWrapper() {
         return wrapper;
     }
 
