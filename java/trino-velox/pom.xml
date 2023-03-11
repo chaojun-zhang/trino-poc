@@ -46,7 +46,7 @@
     <build>
         <resources>
             <resource>
-                <directory> /workspace/trino-poc/java-dist/lib</directory>
+                <directory>${project.basedir}/../../java-dist/lib</directory>
                 <includes>
                     <include>**/*velox_jni.*</include>
                 </includes>
