@@ -17,10 +17,9 @@
 
 #pragma once
 
-#include <cstdint>
 #include <memory>
 #include <unordered_map>
-#include <utility>
+#include <mutex>
 
 namespace trino::velox {
 
