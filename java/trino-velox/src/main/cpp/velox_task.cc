@@ -17,7 +17,7 @@ public:
    void close() override {
    }
 private:
-  int totalBatch{10};
+  int totalBatch{1};
 };
 
 
